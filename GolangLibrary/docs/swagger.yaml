@@ -1,0 +1,263 @@
+basePath: /api
+definitions:
+  entity.Book:
+    properties:
+      author:
+        type: string
+      country_of_origin:
+        type: string
+      id:
+        type: string
+      isbn:
+        type: string
+      publisher:
+        type: string
+      title:
+        type: string
+      year_published:
+        type: integer
+    type: object
+  entity.BookInput:
+    properties:
+      author:
+        type: string
+      country_of_origin:
+        type: string
+      isbn:
+        type: string
+      publisher:
+        type: string
+      title:
+        type: string
+      year_published:
+        type: integer
+    type: object
+  http.ErrorResponse:
+    properties:
+      error:
+        type: string
+    type: object
+  http.SuccessResponse:
+    properties:
+      message:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: This is a simple API for managing a library of books.
+  termsOfService: http://swagger.io/terms/
+  title: Golang Library API
+  version: "1.0"
+paths:
+  /books:
+    get:
+      consumes:
+      - application/json
+      description: Retrieve a list of books, with optional pagination and title-based
+        filtering.
+      parameters:
+      - description: Filter books by partial or full title (case-insensitive)
+        in: query
+        name: title
+        type: string
+      - description: Page number (default is 1)
+        in: query
+        name: page
+        type: integer
+      - description: Number of books per page (default is 10, max is 100)
+        in: query
+        name: page_size
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entity.Book'
+            type: array
+        "400":
+          description: 'Bad request: invalid title or input parameters'
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+        "404":
+          description: No books found
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+        "500":
+          description: Internal server error while fetching books
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+      summary: Get all books
+      tags:
+      - books
+    post:
+      consumes:
+      - application/json
+      description: Adds a new book to the library
+      parameters:
+      - description: Book to create
+        in: body
+        name: book
+        required: true
+        schema:
+          $ref: '#/definitions/entity.BookInput'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/entity.Book'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+      summary: Create a new book
+      tags:
+      - books
+  /books/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: Deletes a book by ID
+      parameters:
+      - description: Book ID
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/http.SuccessResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+      summary: Delete a book
+      tags:
+      - books
+    put:
+      consumes:
+      - application/json
+      description: |-
+        Update a book's details by its ID. The request body should contain the updated
+        book details. If the book is not found, it returns a 404 status with an error message.
+      parameters:
+      - description: Book ID
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: Updated book object
+        in: body
+        name: book
+        required: true
+        schema:
+          $ref: '#/definitions/entity.Book'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.Book'
+        "400":
+          description: Invalid input
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+        "404":
+          description: Book not found
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+        "500":
+          description: Failed to update book
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+      summary: Update a book by ID
+      tags:
+      - books
+  /books/author:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves a list of books by a specific author, with optional partial
+        matching.
+      parameters:
+      - description: Author name
+        in: query
+        name: author
+        required: true
+        type: string
+      - description: Enable partial matching on author name (default is false)
+        in: query
+        name: partial
+        type: boolean
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/entity.Book'
+            type: array
+        "400":
+          description: 'Bad request: invalid author name'
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+        "404":
+          description: No books found for the specified author
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+        "500":
+          description: Internal server error while fetching books by author
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+      summary: Get books by author
+      tags:
+      - books
+  /books/title/{title}:
+    get:
+      consumes:
+      - application/json
+      description: Retrieves a single book by its title
+      parameters:
+      - description: Book title
+        in: path
+        name: title
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/entity.Book'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/http.ErrorResponse'
+      summary: Get book by title
+      tags:
+      - books
+swagger: "2.0"
