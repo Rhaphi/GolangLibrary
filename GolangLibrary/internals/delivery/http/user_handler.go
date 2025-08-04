@@ -26,10 +26,18 @@ func NewUserHandler(uc *usecase.UserUsecase) *Handler {
 	return &Handler{UserUsecase: uc}
 }
 
+func writeJSONError(w http.ResponseWriter, message string, status int) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(status)
+	json.NewEncoder(w).Encode(map[string]string{
+		"error": message,
+	})
+}
+
 func (h *Handler) RegisterUser(w http.ResponseWriter, r *http.Request) {
 	var input entity.RegisterInput
 	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
-		http.Error(w, "Invalid request body", http.StatusBadRequest)
+		writeJSONError(w, "Invalid request body", http.StatusBadRequest)
 		return
 	}
 
@@ -43,13 +51,13 @@ func (h *Handler) RegisterUser(w http.ResponseWriter, r *http.Request) {
 
 	createdUser, err := h.UserUsecase.Register(user)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		writeJSONError(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	token, err := h.UserUsecase.Login(createdUser.Email, input.Password)
 	if err != nil {
-		http.Error(w, "Failed to generate token", http.StatusInternalServerError)
+		writeJSONError(w, "Failed to generate token", http.StatusInternalServerError)
 		return
 	}
 
@@ -68,18 +76,27 @@ func (h *Handler) RegisterUser(w http.ResponseWriter, r *http.Request) {
 func (h *Handler) LoginUser(w http.ResponseWriter, r *http.Request) {
 	var credentials entity.LoginInput
 	if err := json.NewDecoder(r.Body).Decode(&credentials); err != nil {
-		http.Error(w, "Invalid input", http.StatusBadRequest)
+		writeJSONError(w, "Invalid input", http.StatusBadRequest)
 		return
 	}
 
 	token, err := h.UserUsecase.Login(credentials.Email, credentials.Password)
 	if err != nil {
-		http.Error(w, "Invalid email or password", http.StatusUnauthorized)
+		writeJSONError(w, "Invalid email or password", http.StatusUnauthorized)
 		return
 	}
 
+	user, err := h.UserUsecase.GetByEmail(credentials.Email)
+	if err != nil {
+		writeJSONError(w, "Failed to get user data", http.StatusInternalServerError)
+		return
+	}
+
+	user.Password = ""
+
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]string{
+	json.NewEncoder(w).Encode(map[string]interface{}{
+		"user":  user,
 		"token": token,
 	})
 }
@@ -87,13 +104,13 @@ func (h *Handler) LoginUser(w http.ResponseWriter, r *http.Request) {
 func (h *Handler) GetUserProfile(w http.ResponseWriter, r *http.Request) {
 	userID := r.Context().Value(userIDKey)
 	if userID == nil {
-		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		writeJSONError(w, "Unauthorized", http.StatusUnauthorized)
 		return
 	}
 
 	user, err := h.UserUsecase.GetByID(userID.(uint))
 	if err != nil {
-		http.Error(w, "User not found", http.StatusNotFound)
+		writeJSONError(w, "User not found", http.StatusNotFound)
 		return
 	}
 
@@ -103,19 +120,19 @@ func (h *Handler) GetUserProfile(w http.ResponseWriter, r *http.Request) {
 func (h *Handler) UpdateUserProfile(w http.ResponseWriter, r *http.Request) {
 	userID := r.Context().Value(userIDKey)
 	if userID == nil {
-		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		writeJSONError(w, "Unauthorized", http.StatusUnauthorized)
 		return
 	}
 
 	var input entity.User
 	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
-		http.Error(w, "Invalid input", http.StatusBadRequest)
+		writeJSONError(w, "Invalid input", http.StatusBadRequest)
 		return
 	}
 
 	updatedUser, err := h.UserUsecase.UpdateUser(userID.(uint), input)
 	if err != nil {
-		http.Error(w, "Failed to update profile", http.StatusInternalServerError)
+		writeJSONError(w, "Failed to update profile", http.StatusInternalServerError)
 		return
 	}
 
@@ -127,7 +144,7 @@ func AuthMiddleware(secret string) func(http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			authHeader := r.Header.Get("Authorization")
 			if authHeader == "" || !strings.HasPrefix(authHeader, "Bearer ") {
-				http.Error(w, "Unauthorized — missing or malformed token", http.StatusUnauthorized)
+				writeJSONError(w, "Unauthorized — missing or malformed token", http.StatusUnauthorized)
 				return
 			}
 
@@ -140,19 +157,19 @@ func AuthMiddleware(secret string) func(http.Handler) http.Handler {
 				return []byte(secret), nil
 			})
 			if err != nil || !token.Valid {
-				http.Error(w, "Unauthorized — invalid token", http.StatusUnauthorized)
+				writeJSONError(w, "Unauthorized — invalid token", http.StatusUnauthorized)
 				return
 			}
 
 			claims, ok := token.Claims.(jwt.MapClaims)
 			if !ok {
-				http.Error(w, "Unauthorized — invalid claims", http.StatusUnauthorized)
+				writeJSONError(w, "Unauthorized — invalid claims", http.StatusUnauthorized)
 				return
 			}
 
 			userIDFloat, ok := claims["user_id"].(float64)
 			if !ok {
-				http.Error(w, "Unauthorized — invalid user ID", http.StatusUnauthorized)
+				writeJSONError(w, "Unauthorized — invalid user ID", http.StatusUnauthorized)
 				return
 			}
 
