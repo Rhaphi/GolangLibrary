@@ -63,25 +63,25 @@ The primary goals were to:
 ## Project Structure
 
 ```
-├── GolangLibrary
-|   │   ├── books.db                   # SQLite database file
-|   │   ├── cmd
-|   │   │   └── main.go               # Entry point for backend application
-|   │   ├── docs                      # API documentation and Swagger files
-|   │   │   ├── docs.go
-|   │   │   ├── swagger.json
-|   │   │   └── swagger.yaml
-|   │   ├── go.mod                    # Go modules definition
-|   │   ├── go.sum                    # Go modules checksums
-|   │   ├── internals                 # Core backend application logic
-|   │   │   ├── database             # Database connection and migrations
-|   │   │   ├── delivery             # HTTP handlers/controllers
-|   │   │   ├── entity               # Data models/entities
-|   │   │   ├── repository           # Data access logic
-|   │   │   └── usecase              # Business logic/services
-|   │   └── uploads                  # Uploaded book cover images
-|   ├── package-lock.json             # npm package lock for frontend dependencies
-|   ├── package.json                  # npm package file for frontend dependencies
+
+├── GolangLibrary            # Backend Go Folder
+|   ├── books.db             # SQLite database file
+|   ├── cmd
+|   │   └── main.go          # Entry point for backend application
+|   ├── docs                 # API documentation and Swagger files
+|   │   ├── docs.go
+|   │   ├── swagger.json
+|   │   └── swagger.yaml
+|   ├── go.mod               # Go modules definition
+|   ├── go.sum               # Go modules checksums
+|   ├── internals            # Core backend application logic
+|   ├── database             # Database connection and migrations
+|   ├── delivery             # HTTP handlers/controllers
+|   ├── entity               # Data models/entities
+|   ├── repository           # Data access logic
+|   └── usecase              # Business logic/services
+|   └── uploads              # Uploaded book cover images
+
 |
 |
 |
