@@ -4,10 +4,14 @@ import (
 	"GolangLibrary/internals/entity"
 	"GolangLibrary/internals/usecase"
 	"encoding/json"
+	"fmt"
+	"io"
 	"net/http"
+	"os"
 	"regexp"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/gorilla/mux"
 	"gorm.io/gorm"
@@ -32,61 +36,83 @@ type SuccessResponse struct {
 func (h *BookHandler) CreateBook(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
-	var input entity.BookInput
-	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(ErrorResponse{Error: "Invalid input"})
+	err := r.ParseMultipartForm(10 << 20)
+	if err != nil {
+		http.Error(w, "Could not parse multipart form", http.StatusBadRequest)
 		return
 	}
 
-	input.Title = strings.TrimSpace(input.Title)
-	input.Author = strings.TrimSpace(input.Author)
+	title := strings.TrimSpace(r.FormValue("title"))
+	author := strings.TrimSpace(r.FormValue("author"))
+	isbn := strings.TrimSpace(r.FormValue("isbn"))
+	publisher := r.FormValue("publisher")
+	yearStr := r.FormValue("year_published")
+	country := r.FormValue("country_of_origin")
 
-	if input.Title == "" || len(input.Title) > 255 {
-		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(ErrorResponse{Error: "Invalid or missing title"})
+	if title == "" || len(title) > 255 {
+		http.Error(w, "Invalid or missing title", http.StatusBadRequest)
+		return
+	}
+	if author == "" || len(author) > 255 {
+		http.Error(w, "Invalid or missing author", http.StatusBadRequest)
+		return
+	}
+	if isbn == "" || len(isbn) != 13 {
+		http.Error(w, "Invalid or missing ISBN (must be 13 characters)", http.StatusBadRequest)
+		return
+	}
+	if h.Usecase.Exists(title, author) {
+		http.Error(w, "Book with same title and author already exists", http.StatusBadRequest)
+		return
+	}
+	if h.Usecase.ExistsByISBN(isbn) {
+		http.Error(w, "Book with this ISBN already exists", http.StatusBadRequest)
 		return
 	}
 
-	if input.Author == "" || len(input.Author) > 255 {
-		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(ErrorResponse{Error: "Invalid or missing author"})
+	// Parse year
+	year, err := strconv.Atoi(yearStr)
+	if err != nil {
+		http.Error(w, "Invalid year_published", http.StatusBadRequest)
 		return
 	}
 
-	if h.Usecase.Exists(input.Title, input.Author) {
-		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(ErrorResponse{Error: "Book already exists"})
-		return
+	// Handle image
+	var imageURL string
+	file, handler, err := r.FormFile("image")
+	if err == nil {
+		defer file.Close()
+
+		filename := fmt.Sprintf("%d_%s", time.Now().UnixNano(), handler.Filename)
+		filePath := "./uploads/" + filename
+
+		dst, err := os.Create(filePath)
+		if err != nil {
+			http.Error(w, "Failed to save image", http.StatusInternalServerError)
+			return
+		}
+		defer dst.Close()
+		io.Copy(dst, file)
+
+		imageURL = "/uploads/" + filename // This URL will be stored in DB
+	} else {
+		imageURL = "" // Optional image
 	}
 
+	// Create book
 	newBook := entity.Book{
-		Title:           input.Title,
-		Author:          input.Author,
-		YearPublished:   input.YearPublished,
-		Publisher:       input.Publisher,
-		ISBN:            input.ISBN,
-		CountryofOrigin: input.CountryofOrigin,
+		Title:           title,
+		Author:          author,
+		ISBN:            isbn,
+		Publisher:       publisher,
+		YearPublished:   year,
+		CountryofOrigin: country,
+		ImageURL:        imageURL,
 	}
 
 	created, err := h.Usecase.Create(newBook)
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		json.NewEncoder(w).Encode(ErrorResponse{Error: "Failed to create book"})
-		return
-	}
-
-	input.ISBN = strings.TrimSpace(input.ISBN)
-
-	if input.ISBN == "" || len(input.ISBN) != 13 {
-		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(ErrorResponse{Error: "Invalid or missing ISBN (must be 13 characters)"})
-		return
-	}
-
-	if h.Usecase.ExistsByISBN(input.ISBN) {
-		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(ErrorResponse{Error: "Book with this ISBN already exists"})
+		http.Error(w, "Failed to create book", http.StatusInternalServerError)
 		return
 	}
 
@@ -203,24 +229,63 @@ func (h *BookHandler) UpdateBook(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	id := params["id"]
 
-	var updatedBook entity.BookInput
-	if err := json.NewDecoder(r.Body).Decode(&updatedBook); err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(ErrorResponse{Error: "Invalid input"})
+	err := r.ParseMultipartForm(10 << 20)
+	if err != nil {
+		http.Error(w, "Could not parse multipart form", http.StatusBadRequest)
 		return
 	}
 
-	updatedBook.Title = strings.TrimSpace(updatedBook.Title)
-	updatedBook.Author = strings.TrimSpace(updatedBook.Author)
-	if updatedBook.Title == "" || len(updatedBook.Title) > 255 {
-		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(ErrorResponse{Error: "Invalid or missing title"})
+	title := strings.TrimSpace(r.FormValue("title"))
+	author := strings.TrimSpace(r.FormValue("author"))
+	publisher := r.FormValue("publisher")
+	yearStr := r.FormValue("year_published")
+	country := r.FormValue("country_of_origin")
+
+	if title == "" || len(title) > 255 {
+		http.Error(w, "Invalid or missing title", http.StatusBadRequest)
 		return
 	}
-	if updatedBook.Author == "" || len(updatedBook.Author) > 255 {
-		w.WriteHeader(http.StatusBadRequest)
-		json.NewEncoder(w).Encode(ErrorResponse{Error: "Invalid or missing author"})
+	if author == "" || len(author) > 255 {
+		http.Error(w, "Invalid or missing author", http.StatusBadRequest)
 		return
+	}
+
+	var year int
+	if yearStr != "" {
+		year, err = strconv.Atoi(yearStr)
+		if err != nil {
+			http.Error(w, "Invalid year_published", http.StatusBadRequest)
+			return
+		}
+	}
+
+	var imageURL string
+	file, handler, err := r.FormFile("image")
+	if err == nil {
+		defer file.Close()
+		filename := fmt.Sprintf("%d_%s", time.Now().UnixNano(), handler.Filename)
+		filePath := "./uploads/" + filename
+
+		dst, err := os.Create(filePath)
+		if err != nil {
+			http.Error(w, "Failed to save image", http.StatusInternalServerError)
+			return
+		}
+		defer dst.Close()
+		io.Copy(dst, file)
+
+		imageURL = "/uploads/" + filename
+	} else {
+		imageURL = ""
+	}
+
+	updatedBook := entity.BookInput{
+		Title:           title,
+		Author:          author,
+		Publisher:       publisher,
+		YearPublished:   year,
+		CountryofOrigin: country,
+		ImageURL:        imageURL,
 	}
 
 	updated, ok := h.Usecase.Update(id, updatedBook)

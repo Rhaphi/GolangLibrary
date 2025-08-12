@@ -134,10 +134,11 @@ func (uc *bookRepository) Update(id string, updatedData entity.BookInput) (entit
 
 	book.Title = updatedData.Title
 	book.Author = updatedData.Author
-	book.YearPublished = updatedData.YearPublished
-	book.Publisher = updatedData.Publisher
 	book.ISBN = updatedData.ISBN
+	book.Publisher = updatedData.Publisher
+	book.YearPublished = updatedData.YearPublished
 	book.CountryofOrigin = updatedData.CountryofOrigin
+	book.ImageURL = updatedData.ImageURL
 
 	if err := uc.db.Save(&book).Error; err != nil {
 		return entity.Book{}, false

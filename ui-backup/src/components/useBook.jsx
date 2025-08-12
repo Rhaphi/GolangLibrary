@@ -17,8 +17,8 @@ export function useBooks(page, pageSize = 10) {
 
         if (!cancel) {
           const data = res.data;
-          setBooks(data.books); // ✅ FIXED: Use the array from the response
-          setHasNextPage(page * pageSize < data.total_count); // ✅ Use total_count to calculate
+          setBooks(data.books);
+          setHasNextPage(page * pageSize < data.total_count);
         }
       } catch (err) {
         if (!cancel) {

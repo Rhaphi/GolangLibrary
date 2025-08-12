@@ -19,7 +19,7 @@ export default function Register() {
         password,
       });
 
-      const { token } = response.data; 
+      const { token } = response.data;
       if (!token) {
         throw new Error('No token received from server');
       }
@@ -29,53 +29,59 @@ export default function Register() {
       navigate('/profile');
     } catch (err) {
       console.error(err);
-      setError('Registration failed. Email might already be in use.');
+      if (err.response?.data?.message) {
+        setError(err.response.data.message);
+      } else {
+        setError('Registration failed. Please try again.');
+      }
     }
   };
 
   return (
-    <div className="container mt-5" style={{ maxWidth: '400px' }}>
-      <h2 className="text-center mb-4">Register</h2>
-      <form onSubmit={handleRegister}>
-        <div className="mb-3">
-          <label>Name:</label>
-          <input
-            type="text"
-            className="form-control"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            required
-          />
-        </div>
+    <div className="container mt-5 d-flex justify-content-center">
+      <div className="card shadow p-4" style={{ maxWidth: '400px', width: '100%' }}>
+        <h2 className="text-center mb-4">Register</h2>
+        <form onSubmit={handleRegister}>
+          <div className="mb-3">
+            <label>Name:</label>
+            <input
+              type="text"
+              className="form-control"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
+            />
+          </div>
 
-        <div className="mb-3">
-          <label>Email:</label>
-          <input
-            type="email"
-            className="form-control"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
-        </div>
+          <div className="mb-3">
+            <label>Email:</label>
+            <input
+              type="email"
+              className="form-control"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+          </div>
 
-        <div className="mb-3">
-          <label>Password:</label>
-          <input
-            type="password"
-            className="form-control"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-        </div>
+          <div className="mb-3">
+            <label>Password:</label>
+            <input
+              type="password"
+              className="form-control"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+          </div>
 
-        {error && <div className="alert alert-danger">{error}</div>}
+          {error && <div className="alert alert-danger text-center">{error}</div>}
 
-        <button type="submit" className="btn btn-primary w-100">
-          Register
-        </button>
-      </form>
+          <button type="submit" className="btn btn-success w-100">
+            Register
+          </button>
+        </form>
+      </div>
     </div>
   );
 }

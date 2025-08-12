@@ -18,25 +18,18 @@ export default function Search() {
 
     let url;
     const params = new URLSearchParams();
-
-    // Determine which endpoint to use based on input
     if (title && !author) {
-      // Search by title using /api/books/title/{title}
       url = `${baseURL}/books/title/${encodeURIComponent(title)}`;
     } else if (author && !title) {
-      // Search by author using /api/books/author?author=...
       url = `${baseURL}/books/author`;
       params.append('author', author);
       url += `?${params.toString()}`;
     } else {
-      // If both title and author are provided, prioritize title or adjust as needed
-      // For now, we'll use title search as an example; adjust based on your app's needs
       url = `${baseURL}/books/title/${encodeURIComponent(title)}`;
     }
 
     try {
       const res = await axios.get(url);
-      // Both /api/books/title/{title} and /api/books/author return arrays directly
       setBooks(Array.isArray(res.data) ? res.data : []);
       setError('');
     } catch (err) {

@@ -28,31 +28,37 @@ export default function Profile() {
     };
 
     fetchProfile();
-  }, []); // Empty dependency array to run once on mount
+  }, []);
 
   if (error) {
     return (
       <div className="container mt-5">
-        <div className="alert alert-danger">{error}</div>
+        <div className="alert alert-danger text-center">{error}</div>
       </div>
     );
   }
 
   if (!user) {
     return (
-      <div className="container mt-5">
+      <div className="container mt-5 text-center">
         <p>Loading profile...</p>
       </div>
     );
   }
 
   return (
-    <div className="container mt-5">
-      <h2 className="mb-4">Your Profile</h2>
-      <ul className="list-group">
-        <li className="list-group-item"><strong>Name:</strong> {user.name}</li>
-        <li className="list-group-item"><strong>Email:</strong> {user.email}</li>
-      </ul>
+    <div className="container mt-5 d-flex justify-content-center">
+      <div className="card shadow-sm p-4" style={{ maxWidth: '500px', width: '100%' }}>
+        <h2 className="mb-4 text-center">Your Profile</h2>
+        <ul className="list-group list-group-flush">
+          <li className="list-group-item">
+            <strong>Name:</strong> {user.name || 'N/A'}
+          </li>
+          <li className="list-group-item">
+            <strong>Email:</strong> {user.email || 'N/A'}
+          </li>
+        </ul>
+      </div>
     </div>
   );
 }

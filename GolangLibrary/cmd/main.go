@@ -2,6 +2,7 @@ package main
 
 import (
 	"GolangLibrary/internals/database"
+	"GolangLibrary/internals/entity"
 	"GolangLibrary/internals/repository"
 	"GolangLibrary/internals/usecase"
 	"log"
@@ -17,7 +18,6 @@ import (
 )
 
 func main() {
-
 	err := godotenv.Load()
 	if err != nil {
 		log.Fatal("Error loading .env file")
@@ -31,6 +31,11 @@ func main() {
 	database.ConnectDB()
 	db := database.DB
 
+	err = db.AutoMigrate(&entity.Book{})
+	if err != nil {
+		log.Fatal("Failed to migrate Book table: ", err)
+	}
+
 	bookRepo := repository.NewBookRepository(db)
 	userRepo := repository.NewUserRepository(db)
 
@@ -42,6 +47,10 @@ func main() {
 
 	router := httphandler.NewRouter(bookHandler, userHandler)
 
+	mux := http.NewServeMux()
+	mux.Handle("/", router)
+	mux.Handle("/uploads/", http.StripPrefix("/uploads/", http.FileServer(http.Dir("./uploads"))))
+
 	corsMiddleware := cors.New(cors.Options{
 		AllowedOrigins:   []string{"http://localhost:3000"},
 		AllowedMethods:   []string{"GET", "POST", "PUT", "DELETE"},
@@ -49,7 +58,7 @@ func main() {
 		AllowCredentials: true,
 	})
 
-	handlerWithCORS := corsMiddleware.Handler(router)
+	handlerWithCORS := corsMiddleware.Handler(mux)
 
 	log.Println("Server Running at http://localhost:8080")
 	log.Fatal(http.ListenAndServe(":8080", handlerWithCORS))

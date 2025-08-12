@@ -35,7 +35,7 @@ func ConnectDB() {
 	sqlDB.SetMaxOpenConns(10)
 	sqlDB.SetConnMaxLifetime(30 * time.Minute)
 
-	err = DB.AutoMigrate(&entity.BookInput{}, &entity.User{})
+	err = DB.AutoMigrate(&entity.Book{}, &entity.User{})
 	if err != nil {
 		log.Fatal("Failed to migrate database:", err)
 	}
