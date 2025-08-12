@@ -62,6 +62,7 @@ The primary goals were to:
 
 ## Project Structure
 
+```
 ├── GolangLibrary
 |   │   ├── books.db                   # SQLite database file
 |   │   ├── cmd
@@ -114,7 +115,7 @@ The primary goals were to:
         │   └── SearchBooks.jsx    # Book search page
         ├── reportWebVitals.js     # Performance measuring
         └── setupTests.js          # Testing setup/configuration
-
+```
 
 ## Installation & Setup
 
