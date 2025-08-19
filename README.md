@@ -44,23 +44,60 @@ The primary goals were to:
 
 ## Features
 
-- **User Registration & Authentication**  
-  Users can securely create accounts, log in, and log out.
 
-- **Book Management**  
-  Add, edit, and delete books in the digital library.
+### User Registration & Authentication
+- Register new accounts with unique emails.
+- Log in using email and password.
+- See profile detials
+- Secure authentication for protected actions (like adding, editing, deleting books).
 
-- **Pagination**  
-  Browse books page by page with navigation controls.
+**Registration Flow**
+<img width="2780" height="754" alt="image" src="https://github.com/user-attachments/assets/f0192ca9-016b-4723-a807-0ffe46b97377" />
 
-- **Book Details**  
-  View detailed information for each book, including title, author, publisher, year, ISBN, country of origin, and cover image.
+**Login Flow**
+<img width="3344" height="754" alt="image" src="https://github.com/user-attachments/assets/3deadf8e-6c06-4c83-8610-6143b767f83f" />
 
-- **Search**  
-  Quickly find books by searching titles or authors.
+**Get User Profile flow**
+<img width="2774" height="754" alt="image" src="https://github.com/user-attachments/assets/66bf5dca-7ef6-422f-b2ce-bcd4c556a50b" />
 
-- **Error Handling & User Feedback**  
-  Provides feedback for loading states, errors, and empty search results.
+
+**Authentication Flow**
+<img width="2274" height="754" alt="image" src="https://github.com/user-attachments/assets/7af818b7-0585-47ec-b114-107024484cfb" />
+
+
+### Book Management
+- Add new books with details such as title, author, ISBN, publisher, year, country of origin, and cover image.
+- Edit existing book information.
+- Delete books from the library.
+
+**Create Book Flow**
+<img width="3624" height="750" alt="image" src="https://github.com/user-attachments/assets/ef4e4915-c1cd-480f-a6b5-6424392399ab" />
+
+**Update Book Flow**
+
+**Delete Book Flow**
+
+### Book Browsing & Pagination
+- View all available books with pagination to navigate across pages.
+- See book details in a structured format.
+
+**Flow**
+ <img width="2484" height="1306" alt="image" src="https://github.com/user-attachments/assets/4b3cd949-2f7e-498b-a6f6-311f88496fe5" />
+
+
+### Search & Filtering
+- Search books by title or author.
+- Display results dynamically with user feedback if no matches are found.
+
+**Title search flow**
+<img width="3566" height="800" alt="image" src="https://github.com/user-attachments/assets/ce95b110-c6cd-4842-8b30-2e8aceea65a4" />
+
+**Author search flow**
+<img width="3566" height="818" alt="image" src="https://github.com/user-attachments/assets/ce25eb3f-09b5-466f-b040-0a1e5f5b5354" />
+
+
+
+
 
 ## Data Structure
 **Book**
@@ -82,6 +119,10 @@ The primary goals were to:
 | `name`       | string   | User’s name                     |
 | `email`      | string   | User’s email (must be unique)   |
 | `password`   | string   | Hashed password                 |
+
+## ERD (Entity Relationship Diagram)
+<img width="578" height="408" alt="Golang Library ERD (2)" src="https://github.com/user-attachments/assets/544f404a-52d8-4593-a812-435a8e8b8d45" />
+
 
 
 
@@ -204,10 +245,11 @@ This will launch the app on localhost:3000 by default
 
 - Backend server runs on `http://localhost:8080`
 - Frontend app runs on `http://localhost:3000`
-- API Documentation
+- API Documentation: 
 
 Open your browser and visit `http://localhost:3000` to use the LibraryHUB frontend.  
 All API requests are proxied to the backend at port 8080.
+
 
 
 
