@@ -60,7 +60,6 @@ The primary goals were to:
 **Get User Profile flow**
 <img width="2774" height="754" alt="image" src="https://github.com/user-attachments/assets/66bf5dca-7ef6-422f-b2ce-bcd4c556a50b" />
 
-
 **Authentication Flow**
 <img width="2274" height="754" alt="image" src="https://github.com/user-attachments/assets/7af818b7-0585-47ec-b114-107024484cfb" />
 
@@ -71,11 +70,14 @@ The primary goals were to:
 - Delete books from the library.
 
 **Create Book Flow**
-<img width="3624" height="750" alt="image" src="https://github.com/user-attachments/assets/ef4e4915-c1cd-480f-a6b5-6424392399ab" />
+<img width="3722" height="750" alt="image" src="https://github.com/user-attachments/assets/50155419-cc7b-415c-8bbb-49f34de63a04" />
 
 **Update Book Flow**
+<img width="3574" height="750" alt="image" src="https://github.com/user-attachments/assets/3db798b4-3c3c-47fd-88ea-b04842b5cee3" />
 
 **Delete Book Flow**
+<img width="2682" height="788" alt="image" src="https://github.com/user-attachments/assets/0c7bf083-ccd4-44f2-b85f-9d4c53d9585e" />
+
 
 ### Book Browsing & Pagination
 - View all available books with pagination to navigate across pages.
