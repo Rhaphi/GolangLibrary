@@ -122,9 +122,7 @@ The primary goals were to:
 | `password`   | string   | Hashed password                 |
 
 ## ERD (Entity Relationship Diagram)
-<img width="578" height="408" alt="Golang Library ERD (2)" src="https://github.com/user-attachments/assets/544f404a-52d8-4593-a812-435a8e8b8d45" />
-
-
+<img width="560" height="408" alt="Golang Library ERD (3)" src="https://github.com/user-attachments/assets/56755105-5760-43f6-9c61-76d2d6aca213" />
 
 
 ## Project Structure
