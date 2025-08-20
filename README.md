@@ -133,7 +133,7 @@ GolangLibraryapp               # Root directory
 ├── package.json               # Backend dependencies & scripts
 │
 ├── backend                    # Backend Go application
-│   ├── books.db                # SQLite database file
+│   ├── books.db                # PostgreSQL database file
 │   ├── cmd
 │   │   └── main.go             # Backend entry point
 │   ├── docs                    # Swagger API documentation
