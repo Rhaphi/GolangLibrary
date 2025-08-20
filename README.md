@@ -29,7 +29,6 @@ The primary goals were to:
 - **Authentication:** JWT 
 - **Environment Variables:** godotenv  
 - **CORS Handling:** rs/cors  
-- **API Documentation:** Swagger
 
 ### Frontend
 - **Language:** JavaScript (ES6+), HTML, CSS3
@@ -247,7 +246,6 @@ This will launch the app on localhost:3000 by default
 
 - Backend server runs on `http://localhost:8080`
 - Frontend app runs on `http://localhost:3000`
-- API Documentation: 
 
 Open your browser and visit `http://localhost:3000` to use the LibraryHUB frontend.  
 All API requests are proxied to the backend at port 8080.
