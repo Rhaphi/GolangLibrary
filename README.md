@@ -23,7 +23,7 @@ The primary goals were to:
 ## Tech Stack
 ### Backend
 - **Language:** Golang (v1.24)  
-- **Database:** SQLite  
+- **Database:** PostgreSQL 
 - **Web Framework / Router:** Gorilla Mux  
 - **ORM:** GORM  
 - **Authentication:** JWT 
